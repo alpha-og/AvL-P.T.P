@@ -8,7 +8,7 @@
 
 
 ### Team Members
-- Team Lead: Athul Anoop - [College of Engineering Trivandrum]
+- Team Lead: Athul Anoop - College of Engineering Trivandrum
 
 ### Project Description
 AvL P.T.P (Avian Logistics Pigeon Transfer Protocol) is the best and fastest way to share text, files, images, etc... across devices. 
