@@ -21,7 +21,7 @@ const router = createBrowserRouter(
       element: <PigeonAds />,
     },
     {
-      path: "/:pathMatch(.*)*",
+      path: "*",
       element: <Landing />,
     },
   ],
