@@ -4,7 +4,8 @@ import { SpawnedObject } from "./useProximityDetection";
 
 export type SpawnerOptions = {
   maxPigeons?: number;
-  spawnInterval?: number;
+  minSpawnInterval?: number;
+  maxSpawnInterval?: number;
   containerWidth: number;
   containerHeight: number;
 };
@@ -18,17 +19,23 @@ export const usePigeonSpawner = (
   const [pigeons, setPigeons] = useState<SpawnedObject[]>([]);
   const spawnBlockedRef = useRef(false);
 
-  const spawnPigeon = useCallback(() => {
-    if (!pigeonSprite || spawnBlockedRef.current || messages.length === 0)
-      return;
-    if (pigeons.length >= (options.maxPigeons || 10)) {
+  useEffect(() => {
+    if (pigeons.length > options.maxPigeons!) {
       window.location.href = "/pigeon-ads";
     }
+  }, [pigeons.length, options.maxPigeons]);
 
+  const spawnPigeon = useCallback(() => {
+    // Ensure there's a message to deliver and that spawning is not blocked
+    if (!pigeonSprite || spawnBlockedRef.current || messages.length === 0)
+      return;
+
+    // Block spawning temporarily
     spawnBlockedRef.current = true;
+
+    // Determine a random spawn location
     const spawnSide = Math.random();
     let spawnX, spawnY;
-
     if (spawnSide < 0.33) {
       spawnX = Math.random() * options.containerWidth;
       spawnY = -20;
@@ -40,6 +47,7 @@ export const usePigeonSpawner = (
       spawnY = Math.random() * options.containerHeight;
     }
 
+    // Create the pigeon body
     const pigeonBody = Bodies.circle(spawnX, spawnY, 20, {
       friction: 10,
       render: {
@@ -55,31 +63,37 @@ export const usePigeonSpawner = (
       frictionAir: 0.01,
     });
 
+    // Add the new pigeon to the pigeons state
     setPigeons((prev) => [
       ...prev,
       {
-        id: pigeonBody.id + "",
+        id: `${pigeonBody.id}`,
         x: spawnX,
         y: spawnY,
         payload: 0,
         body: pigeonBody,
       },
-    ]); // Update state instead of ref
+    ]);
+
+    // Add the pigeon to the Matter.js physics world
     World.add(engine.world, pigeonBody);
 
-    setTimeout(
-      () => {
-        spawnBlockedRef.current = false;
-      },
-      Math.random() * (options.spawnInterval || 5000),
-    );
-  }, [engine, pigeonSprite, messages.length, options, pigeons.length]);
+    // Schedule the next spawn with a random delay
+    const nextSpawnDelay =
+      Math.random() * (options.maxSpawnInterval! - options.minSpawnInterval!) +
+      options.minSpawnInterval!;
+    setTimeout(() => {
+      spawnBlockedRef.current = false;
+      spawnPigeon(); // Recursively call to spawn the next pigeon at a random time
+    }, nextSpawnDelay);
+  }, [engine, pigeonSprite, messages.length, options]);
 
+  // Initial spawn when messages are available
   useEffect(() => {
-    if (!spawnBlockedRef.current) {
+    if (messages.length > 0 && !spawnBlockedRef.current) {
       spawnPigeon();
     }
-  }, [spawnPigeon]);
+  }, [spawnPigeon, messages.length]);
 
-  return { pigeons }; // Return state instead of ref
+  return { pigeons };
 };
