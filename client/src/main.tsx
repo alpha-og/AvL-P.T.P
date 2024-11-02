@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Room from "./pages/Room";
 import Landing from "./pages/Landing";
 import Navbar from "./components/common/Navbar";
+import PigeonAds from "./pages/PigeonAds";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: "/room",
     element: <Room />,
+  },
+  {
+    path: "/pigeon-ads",
+    element: <PigeonAds />,
   },
 ]);
 

@@ -21,7 +21,9 @@ export const usePigeonSpawner = (
   const spawnPigeon = useCallback(() => {
     if (!pigeonSprite || spawnBlockedRef.current || messages.length === 0)
       return;
-    if (pigeons.length >= (options.maxPigeons || 10)) return;
+    if (pigeons.length >= (options.maxPigeons || 10)) {
+      window.location.href = "/pigeon-ads";
+    }
 
     spawnBlockedRef.current = true;
     const spawnSide = Math.random();
