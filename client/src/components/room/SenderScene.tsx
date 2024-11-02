@@ -1,16 +1,32 @@
 import { type RefObject, useEffect, useRef, useState } from "react";
-import { Engine, Render, World, Bodies, Runner } from "matter-js";
+import {
+  Engine,
+  Render,
+  World,
+  Bodies,
+  Runner,
+  Events,
+  Composite,
+  Body,
+} from "matter-js";
+import useSocketIo from "@hooks/useSocketIo";
 import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
+import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
+import { useRoomStore } from "@store/roomStore";
 
 export default function MatterContainer() {
   const canvas = useRef<HTMLDivElement>(); //Your div element
+  const socket = useSocketIo();
 
+  const { room } = useRoomStore();
   //Matter.js references
   const engine = useRef(Engine.create());
   const render = useRef<Render | null>(null);
   const runner = useRef<Runner | null>(null);
   const [spawnDelay, setSpawnDelay] = useState(0);
   const [pigeonSprite, setPigeonSprite] = useState<string>("");
+  const [idleManSprite, setIdleManSprite] = useState<string>("");
+  const [senderIdleMan, setSenderIdleMan] = useState<Body>();
   const [pigeons, setPigeons] = useState<Matter.Body[]>([]);
   const [spawnBlocked, setSpawnBlocked] = useState(false);
 
@@ -32,6 +48,17 @@ export default function MatterContainer() {
         background: "#BBBBBB", //Background color
       },
     });
+
+    const canvasC = document.createElement("canvas");
+    const ctx = canvasC.getContext("2d");
+    const spriteSheet = new Image();
+    spriteSheet.src = idleManSpriteSheet;
+
+    spriteSheet.onload = () => {
+      if (!ctx) return;
+      ctx.drawImage(spriteSheet, 0, 0, 64, 64, 0, 0, 128, 128);
+      setIdleManSprite(canvasC.toDataURL());
+    };
 
     // Adding the objects to the engine.
     World.add(engine.current.world, [
@@ -68,6 +95,24 @@ export default function MatterContainer() {
     Engine.clear(engine.current);
   };
 
+  const moveBodies = (target: { x: number; y: number }) => {
+    Composite.allBodies(engine.current.world).forEach((body) => {
+      if (body) {
+        const dx = target.x - body.position.x;
+        const dy = target.y - body.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const forceMagnitude = Math.min(0.05 * distance, 0.5); // Adjust force strength
+
+        const force = {
+          x: (forceMagnitude * dx) / distance,
+          y: (forceMagnitude * dy) / distance,
+        };
+
+        Body.applyForce(body, body.position, force);
+      }
+    });
+  };
+
   //This will only run once. It will initialize the Matter.js render and add the mouse listener.
   useEffect(() => {
     const canvasC = document.createElement("canvas");
@@ -82,11 +127,60 @@ export default function MatterContainer() {
     };
 
     initializeRenderer(); //Initialize Matter.js objects
+
     return () => {
       //Done when the component closes. Do the opposite.
       clearRenderer(); //Remove all data from Matter.js
     };
   }, []);
+  useEffect(() => {
+    console.log(socket);
+    const updatePigeons = () => {
+      const updatedPigeons = pigeons.map((pigeon) => {
+        return {
+          id: pigeon.id,
+          x: pigeon.position.x,
+          y: pigeon.position.y,
+        };
+      });
+      const payload = {
+        room,
+        pigeons: updatedPigeons,
+      };
+      socket.emit("update_pigeon", payload);
+    };
+    const engineCurrent = engine.current;
+    Events.on(engineCurrent, "beforeUpdate", updatePigeons);
+    return () => {
+      Events.off(engineCurrent, "beforeUpdate", updatePigeons);
+    };
+  }, [room, pigeons, socket]);
+
+  useEffect(() => {
+    if (idleManSprite === "") return;
+    const height = canvas.current!.offsetHeight;
+    const width = canvas.current!.offsetWidth;
+    const idleManBody = Bodies.circle(width - 0.8 * width, height - 48, 20, {
+      isStatic: true,
+      friction: 5,
+      render: {
+        sprite: {
+          texture: idleManSprite,
+          xScale: 1,
+          yScale: 1,
+        },
+      },
+      mass: 1,
+      restitution: 0.5,
+      density: 0.001,
+      frictionAir: 0.01,
+    });
+    if (senderIdleMan) {
+      setSenderIdleMan(idleManBody);
+    } else {
+      World.add(engine.current.world, idleManBody);
+    }
+  }, [idleManSprite, senderIdleMan]);
 
   useEffect(() => {
     if (!pigeonSprite || spawnBlocked) return;
@@ -118,7 +212,7 @@ export default function MatterContainer() {
 
       World.add(engine.current.world, pigeonBody);
 
-      const delay = Math.random() * 1000;
+      const delay = Math.random() * 5000;
       setSpawnBlocked(false);
       setSpawnDelay(delay);
     }, spawnDelay);
