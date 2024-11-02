@@ -10,6 +10,7 @@ import {
   Body,
 } from "matter-js";
 import useSocketIo from "@hooks/useSocketIo";
+import useSprite from "@hooks/useSprite";
 import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
 import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
 import { useRoomStore } from "@store/roomStore";
@@ -23,10 +24,53 @@ export default function MatterContainer() {
   const engine = useRef(Engine.create());
   const render = useRef<Render | null>(null);
   const runner = useRef<Runner | null>(null);
+
   const [spawnDelay, setSpawnDelay] = useState(0);
-  const [pigeonSprite, setPigeonSprite] = useState<string>("");
-  const [idleManSprite, setIdleManSprite] = useState<string>("");
-  const [senderIdleMan, setSenderIdleMan] = useState<Body>();
+
+  // load sprites
+
+  const pigeonSprite = useSprite(
+    pigeonSpriteSheet,
+    0,
+    0,
+    600,
+    600,
+    0,
+    0,
+    128,
+    128,
+    1,
+    1,
+  );
+  const senderSprite = useSprite(
+    idleManSpriteSheet,
+    0,
+    0,
+    64,
+    64,
+    0,
+    0,
+    128,
+    128,
+    1,
+    1,
+  );
+  const receiverSprite = useSprite(
+    idleManSpriteSheet,
+    64,
+    0,
+    64,
+    64,
+    0,
+    0,
+    128,
+    128,
+    -1,
+    1,
+  );
+
+  const [senderBody, setSenderBody] = useState<Body | null>(null);
+  const [receiverBody, setReceiverBody] = useState<Body | null>(null);
   const [pigeons, setPigeons] = useState<Matter.Body[]>([]);
   const [spawnBlocked, setSpawnBlocked] = useState(false);
 
@@ -48,18 +92,6 @@ export default function MatterContainer() {
         background: "#BBBBBB", //Background color
       },
     });
-
-    const canvasC = document.createElement("canvas");
-    const ctx = canvasC.getContext("2d");
-    const spriteSheet = new Image();
-    spriteSheet.src = idleManSpriteSheet;
-
-    spriteSheet.onload = () => {
-      if (!ctx) return;
-      ctx.drawImage(spriteSheet, 0, 0, 64, 64, 0, 0, 128, 128);
-      setIdleManSprite(canvasC.toDataURL());
-    };
-
     // Adding the objects to the engine.
     World.add(engine.current.world, [
       Bodies.rectangle(width / 2, height + 10, width, 20, {
@@ -115,17 +147,6 @@ export default function MatterContainer() {
 
   //This will only run once. It will initialize the Matter.js render and add the mouse listener.
   useEffect(() => {
-    const canvasC = document.createElement("canvas");
-    const ctx = canvasC.getContext("2d");
-    const spriteSheet = new Image();
-    spriteSheet.src = pigeonSpriteSheet;
-
-    spriteSheet.onload = () => {
-      if (!ctx) return;
-      ctx.drawImage(spriteSheet, 0, 0, 600, 600, 0, 0, 128, 128);
-      setPigeonSprite(canvasC.toDataURL());
-    };
-
     initializeRenderer(); //Initialize Matter.js objects
 
     return () => {
@@ -157,15 +178,15 @@ export default function MatterContainer() {
   }, [room, pigeons, socket]);
 
   useEffect(() => {
-    if (idleManSprite === "") return;
+    if (!senderSprite) return;
     const height = canvas.current!.offsetHeight;
     const width = canvas.current!.offsetWidth;
-    const idleManBody = Bodies.circle(width - 0.8 * width, height - 48, 20, {
+    const senderBody = Bodies.circle(30, height - 48, 20, {
       isStatic: true,
       friction: 5,
       render: {
         sprite: {
-          texture: idleManSprite,
+          texture: senderSprite,
           xScale: 1,
           yScale: 1,
         },
@@ -175,12 +196,34 @@ export default function MatterContainer() {
       density: 0.001,
       frictionAir: 0.01,
     });
-    if (senderIdleMan) {
-      setSenderIdleMan(idleManBody);
-    } else {
-      World.add(engine.current.world, idleManBody);
-    }
-  }, [idleManSprite, senderIdleMan]);
+    // if (senderBody) {
+    //   setSenderBody(senderBody);
+    // } else {
+    World.add(engine.current.world, senderBody);
+    // }
+  }, [senderSprite, senderBody]);
+
+  useEffect(() => {
+    if (!receiverSprite) return;
+    const height = canvas.current!.offsetHeight;
+    const width = canvas.current!.offsetWidth;
+    const receiverBody = Bodies.circle(width - 30, height - 48, 20, {
+      isStatic: true,
+      friction: 5,
+      render: {
+        sprite: {
+          texture: receiverSprite,
+          xScale: 1,
+          yScale: 1,
+        },
+      },
+      mass: 1,
+      restitution: 0.5,
+      density: 0.001,
+      frictionAir: 0.01,
+    });
+    World.add(engine.current.world, receiverBody);
+  }, [receiverSprite, receiverBody]);
 
   useEffect(() => {
     if (!pigeonSprite || spawnBlocked) return;
