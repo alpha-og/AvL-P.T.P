@@ -24,16 +24,17 @@ The Pigeon Transfer Protocol achieves transfer speeds beyond what the latest gig
 - JS/ TS
 - ReactJS, ExpressJS
 - DaisyUI, Matter.js, SocketIO
-- NeoVim, Supermaven
+- NeoVim, Supermaven, Claude
 
 ### Implementation
 For Software:
 # Installation
-[commands]
-`pnpm i`
+client: `cd client && pnpm i`
+server: `cd server && pnpm i`
 # Run
 [commands]
-`pnpm run dev`
+client: `pnpm dev`
+server: `pnpm dev`
 ### Project Documentation
 For Software:
 
@@ -55,13 +56,14 @@ The main attraction of the website is this page where users can start chatting/ 
 ### Project Demo
 # Video
 [Add your demo video link here]
-*Explain what the video demonstrates*
+https://github.com/user-attachments/assets/a3f563ac-71a5-4a1b-9dd9-a8053288a138
+The video is a walkthrough of the website landing page and the chat room filled with pigeons. One message is all it takes to summon the power of a thousand pigeons.
 
 # Additional Demos
 [Add any extra demo materials/links]
 
 ## Team Contributions
-- Athul Anoop: Design, Development, Hosting
+- Athul Anoop: Design & Development
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
