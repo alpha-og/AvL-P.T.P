@@ -28,7 +28,14 @@ The Pigeon Transfer Protocol achieves transfer speeds beyond what the latest gig
 
 ### Implementation
 For Software:
+
+The frontend is implemented using TypeScript, ReactJS and TailwindCSS with DaisyUI. State management is accomplished with zustand. The 2D sprites are spawned and controlled by Matter.js. Matter.js provides a 2D physics and rendering engine, enabling complex simulations and object interactions.
+
+The backend runs an express.js-NodeJs server that provides the necessary SocketIO connection. The hosted project does not utilise this as the backend has not been hosted due to time constraints, however the frontend is capable of doing so. To enable real time sharing of the Matter.js environment across the sender and receiver
+
 # Installation
+Clone the repository.
+
 client: `cd client && pnpm i`
 
 server: `cd server && pnpm i`
