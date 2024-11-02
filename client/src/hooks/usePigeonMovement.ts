@@ -29,13 +29,13 @@ export const usePigeonMovement = (
         Body.applyForce(body, body.position, force);
       });
 
-      const updatedPigeons = pigeons.map((pigeon) => ({
-        id: pigeon.id,
-        x: pigeon.x,
-        y: pigeon.y,
-      }));
+      // const updatedPigeons = pigeons.map((pigeon) => ({
+      //   id: pigeon.id,
+      //   x: pigeon.x,
+      //   y: pigeon.y,
+      // }));
 
-      socket.emit("update_pigeon", { room, pigeons: updatedPigeons });
+      // socket.emit("update_pigeon", { room, pigeons: updatedPigeons });
     };
 
     Events.on(engine, "beforeUpdate", updateHandler);
