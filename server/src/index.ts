@@ -3,6 +3,13 @@ import http from "http";
 import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
 
+type T_Pigeon = {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+};
+
 const app: Express = express();
 // Enable CORS
 app.use(
@@ -36,10 +43,8 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} joined room ${room}`);
   });
 
-  // Handle messages sent to a specific room
-  socket.on("send_message", (data: { room: string; message: string }) => {
-    io.to(data.room).emit("receive_message", data.message);
-    console.log(`Message sent to room ${data.room}: ${data.message}`);
+  socket.on("update_pigeon", (data: { room: string; pigeons: T_Pigeon[] }) => {
+    socket.to(data.room).emit("update_pigeon_progress", data.pigeons);
   });
 
   // Handle disconnect
