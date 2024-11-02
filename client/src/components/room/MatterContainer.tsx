@@ -1,7 +1,6 @@
-import { useEffect, useRef } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import { Engine, Render, World, Bodies, Runner } from "matter-js";
-import pigeonSpriteSheet from "./assets/pigeon_sprite_sheet.png";
-let pigeon = "";
+import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
 
 export default function MatterContainer() {
   const canvas = useRef<HTMLDivElement>(); //Your div element
@@ -10,6 +9,10 @@ export default function MatterContainer() {
   const engine = useRef(Engine.create());
   const render = useRef<Render | null>(null);
   const runner = useRef<Runner | null>(null);
+  const [spawnDelay, setSpawnDelay] = useState(0);
+  const [pigeonSprite, setPigeonSprite] = useState<string>("");
+  const [pigeons, setPigeons] = useState<Matter.Body[]>([]);
+  const [spawnBlocked, setSpawnBlocked] = useState(false);
 
   //Initialize everything from Matter.js
   const initializeRenderer = () => {
@@ -75,20 +78,32 @@ export default function MatterContainer() {
     spriteSheet.onload = () => {
       if (!ctx) return;
       ctx.drawImage(spriteSheet, 0, 0, 600, 600, 0, 0, 128, 128);
-      pigeon = canvasC.toDataURL();
+      setPigeonSprite(canvasC.toDataURL());
     };
 
     initializeRenderer(); //Initialize Matter.js objects
-    const interval = setInterval(() => {
+    return () => {
+      //Done when the component closes. Do the opposite.
+      clearRenderer(); //Remove all data from Matter.js
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pigeonSprite || spawnBlocked) return;
+    const timeout = setTimeout(() => {
+      if (pigeons.length >= 10) return;
+      setSpawnBlocked(true);
       const height = canvas.current!.offsetHeight;
       const width = canvas.current!.offsetWidth;
-      World.add(
-        engine.current.world,
-        Bodies.circle(Math.random() * width, Math.random() * height, 20, {
+      const pigeonBody = Bodies.circle(
+        Math.random() * width,
+        Math.random() * height,
+        20,
+        {
           friction: 10,
           render: {
             sprite: {
-              texture: pigeon,
+              texture: pigeonSprite,
               xScale: 0.5,
               yScale: 0.5,
             },
@@ -97,31 +112,23 @@ export default function MatterContainer() {
           restitution: 0.5,
           density: 0.001,
           frictionAir: 0.01,
-        }),
+        },
       );
-    }, 1000); //Add a new pigeon every 1000 ms
+      setPigeons((prev) => [...prev, pigeonBody]);
 
-    return () => {
-      //Done when the component closes. Do the opposite.
-      clearInterval(interval);
-      clearRenderer(); //Remove all data from Matter.js
-    };
-  }, []);
+      World.add(engine.current.world, pigeonBody);
+
+      const delay = Math.random() * 1000;
+      setSpawnBlocked(false);
+      setSpawnDelay(delay);
+    }, spawnDelay);
+    return () => clearTimeout(timeout);
+  }, [spawnDelay, pigeonSprite, spawnBlocked, pigeons]);
 
   return (
-    <>
-      <div
-        ref={canvas as unknown as React.RefObject<HTMLDivElement>}
-        className="bg-white h-[85%] w-full flex justify-center items-center rounded-[12px] border-[3px] border-slate-800 overflow-hidden"
-      ></div>
-      <div className="join w-full ">
-        <input
-          type="text"
-          placeholder="Enter a message"
-          className="input join-item w-full focus:outline-none"
-        />
-        <button className="btn join-item">Send</button>
-      </div>
-    </>
+    <div
+      ref={canvas as unknown as RefObject<HTMLDivElement>}
+      className="bg-white h-full w-full flex justify-center items-center rounded-[12px] border-[3px] border-slate-800 overflow-hidden"
+    ></div>
   );
 }
