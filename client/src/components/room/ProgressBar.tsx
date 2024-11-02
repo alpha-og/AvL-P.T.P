@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AlertCircle, Clock, Fingerprint, Server } from "lucide-react";
 import { T_Pigeon } from "@store/pigeonStore";
 
