@@ -67,8 +67,8 @@ export default function SenderView() {
   const containerHeight = canvas.current?.offsetHeight ?? 0;
 
   const { pigeons } = usePigeonSpawner(engine, pigeonSprite, messages, {
-    maxPigeons: 10,
-    spawnInterval: 5000,
+    maxPigeons: 1000,
+    spawnInterval: 1,
     containerWidth,
     containerHeight,
   });
