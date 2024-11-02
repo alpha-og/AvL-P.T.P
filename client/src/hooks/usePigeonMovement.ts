@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Events, Body, Engine } from "matter-js";
 import { Socket } from "socket.io-client";
+import { SpawnedObject } from "./useProximityDetection";
 
 export const usePigeonMovement = (
   engine: Engine,
-  pigeons: Body[],
+  pigeons: SpawnedObject[],
   target: Body | null,
   socket: Socket,
   room: string,
@@ -13,7 +14,8 @@ export const usePigeonMovement = (
     if (!target || pigeons.length === 0) return;
 
     const updateHandler = () => {
-      pigeons.forEach((body) => {
+      pigeons.forEach(({ body }) => {
+        if (!body) return;
         const dx = target.position.x - body.position.x;
         const dy = target.position.y - body.position.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -29,8 +31,8 @@ export const usePigeonMovement = (
 
       const updatedPigeons = pigeons.map((pigeon) => ({
         id: pigeon.id,
-        x: pigeon.position.x,
-        y: pigeon.position.y,
+        x: pigeon.x,
+        y: pigeon.y,
       }));
 
       socket.emit("update_pigeon", { room, pigeons: updatedPigeons });

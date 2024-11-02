@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { World, Bodies } from "matter-js";
+import { SpawnedObject } from "./useProximityDetection";
 
 export type SpawnerOptions = {
   maxPigeons?: number;
@@ -14,7 +15,7 @@ export const usePigeonSpawner = (
   messages: string[],
   options: SpawnerOptions,
 ) => {
-  const [pigeons, setPigeons] = useState<Matter.Body[]>([]); // Changed to useState
+  const [pigeons, setPigeons] = useState<SpawnedObject[]>([]);
   const spawnBlockedRef = useRef(false);
 
   const spawnPigeon = useCallback(() => {
@@ -52,7 +53,15 @@ export const usePigeonSpawner = (
       frictionAir: 0.01,
     });
 
-    setPigeons((prev) => [...prev, pigeonBody]); // Update state instead of ref
+    setPigeons((prev) => [
+      ...prev,
+      {
+        x: spawnX,
+        y: spawnY,
+        payload: 0,
+        body: pigeonBody,
+      },
+    ]); // Update state instead of ref
     World.add(engine.world, pigeonBody);
 
     setTimeout(

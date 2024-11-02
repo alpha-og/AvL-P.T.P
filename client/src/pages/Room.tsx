@@ -62,7 +62,7 @@ export default function Room() {
   }, [isSender, socket, setPigeons]);
 
   return (
-    <div className="h-full w-full p-4 flex flex-col items-center justify-center">
+    <div className="h-screen w-full p-4 flex flex-col items-center justify-center ">
       {joinedRoom ? (
         <div className="w-full h-full flex flex-col items-center justify-center gap-2">
           <div className="relative w-full h-full flex flex-col items-center justify-center border border-zinc-50/10 rounded-xl">

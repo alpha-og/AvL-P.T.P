@@ -18,7 +18,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <div className="w-screen h-screen flex flex-col bg-slate-700">
+    <div className="w-screen min-h-screen flex flex-col bg-zinc-900">
       <Navbar />
       <RouterProvider router={router} />
     </div>

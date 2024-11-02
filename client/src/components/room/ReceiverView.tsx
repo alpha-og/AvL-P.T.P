@@ -1,129 +1,175 @@
-import { type RefObject, useEffect, useRef, useState } from "react";
-import { Engine, Render, World, Bodies, Runner, Body } from "matter-js";
-import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
+import { useRef, useEffect, useState } from "react";
+import { Bodies, World, Body } from "matter-js";
+import { useRenderer } from "@hooks/useRenderer";
+import { useCharacterBody } from "@hooks/useCharacterBody";
 import { usePigeonStore } from "@/store/pigeonStore";
+import useSprite from "@hooks/useSprite";
+import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
+import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
 
-// Function to move bodies toward a specific point
+interface Pigeon {
+  id: string;
+  x: number;
+  y: number;
+}
 
-export default function MatterContainer() {
-  const canvas = useRef<HTMLDivElement>();
+export default function ReceiverView() {
+  const canvas = useRef<HTMLDivElement>(null);
   const { pigeons } = usePigeonStore();
-
-  const engine = useRef(Engine.create());
-  const render = useRef<Render | null>(null);
-  const runner = useRef<Runner | null>(null);
-  const pigeonBodies = useRef<Map<string, Matter.Body>>(new Map());
-  const [pigeonSprite, setPigeonSprite] = useState<string>("");
-
-  const initializeRenderer = () => {
-    if (!canvas.current) return;
-
-    const height = canvas.current.offsetHeight;
-    const width = canvas.current.offsetWidth;
-
-    render.current = Render.create({
-      element: canvas.current,
-      engine: engine.current,
-      options: {
-        width: width,
-        height: height,
-        wireframes: false,
-        background: "#BBBBBB",
-      },
-    });
-
-    World.add(engine.current.world, [
-      Bodies.rectangle(width / 2, height + 10, width, 20, { isStatic: true }),
-      Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true }),
-      Bodies.rectangle(-10, height / 2, 20, height, { isStatic: true }),
-    ]);
-
-    Runner.run(engine.current);
-    Render.run(render.current);
-    runner.current = Runner.create();
-    Runner.run(runner.current, engine.current);
-  };
-
-  const clearRenderer = () => {
-    if (render.current) {
-      Render.stop(render.current);
-      Runner.stop(runner.current!);
-      render.current.canvas.remove();
-    }
-    if (engine.current) {
-      World.clear(engine.current.world, true);
-      Engine.clear(engine.current);
-    }
-  };
+  const pigeonBodiesRef = useRef<Map<string, Matter.Body>>(new Map());
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    initializeRenderer();
-
-    const canvasC = document.createElement("canvas");
-    canvasC.width = 128; // Set canvas size to match final sprite size
-    canvasC.height = 128;
-    const ctx = canvasC.getContext("2d");
-
-    const spriteSheet = new Image();
-    spriteSheet.src = pigeonSpriteSheet;
-    spriteSheet.onload = () => {
-      if (!ctx) return;
-      // Draw specific frame from sprite sheet
-      // Assuming first frame is at 0,0 and each frame is 600x600
-      ctx.drawImage(spriteSheet, 0, 0, 600, 600, 0, 0, 128, 128);
-
-      const spriteDataUrl = canvasC.toDataURL();
-      console.log("Sprite extracted successfully");
-      setPigeonSprite(spriteDataUrl);
-    };
-
-    return () => {
-      clearRenderer();
-    };
+    if (canvas.current) {
+      setDimensions({
+        width: canvas.current.offsetWidth,
+        height: canvas.current.offsetHeight,
+      });
+    }
   }, []);
 
+  const { engine } = useRenderer(canvas, { background: "#BBBBBB" });
+
+  // Load sprites
+  const pigeonSprite = useSprite(
+    pigeonSpriteSheet,
+    0,
+    0,
+    600,
+    600,
+    0,
+    0,
+    128,
+    128,
+    1,
+    1,
+  );
+  const receiverSprite = useSprite(
+    idleManSpriteSheet,
+    0,
+    0,
+    64,
+    64,
+    0,
+    0,
+    128,
+    128,
+    -1,
+    1,
+  );
+
+  // Create receiver character
+  useCharacterBody(engine, receiverSprite, {
+    x: dimensions.width - 30,
+    y: dimensions.height - 48,
+    flipped: true,
+  });
+
+  // Debug bounds visual
   useEffect(() => {
-    if (!pigeonSprite) return;
+    if (!engine || !engine.world) return;
 
-    const existingBodies = pigeonBodies.current;
+    // Add invisible boundary walls for debugging
+    const walls = [
+      Bodies.rectangle(dimensions.width / 2, -10, dimensions.width, 20, {
+        isStatic: true,
+        render: { visible: false },
+      }), // top
+      Bodies.rectangle(
+        dimensions.width / 2,
+        dimensions.height + 10,
+        dimensions.width,
+        20,
+        { isStatic: true, render: { visible: false } },
+      ), // bottom
+      Bodies.rectangle(-10, dimensions.height / 2, 20, dimensions.height, {
+        isStatic: true,
+        render: { visible: false },
+      }), // left
+      Bodies.rectangle(
+        dimensions.width + 10,
+        dimensions.height / 2,
+        20,
+        dimensions.height,
+        { isStatic: true, render: { visible: false } },
+      ), // right
+    ];
 
+    World.add(engine.world, walls);
+
+    return () => {
+      World.remove(engine.world, walls);
+    };
+  }, [engine, dimensions]);
+
+  // Sync physics bodies with pigeon state
+  useEffect(() => {
+    if (!pigeonSprite || !engine || !engine.world || dimensions.width === 0)
+      return;
+
+    const pigeonBodies = pigeonBodiesRef.current;
+
+    // Create or update pigeon bodies based on state
     pigeons.forEach((pigeon) => {
-      let body = existingBodies.get(pigeon.id);
+      let body = pigeonBodies.get(pigeon.id);
+
+      // Ensure pigeon position is within bounds
+      const boundedX = Math.max(20, Math.min(pigeon.x, dimensions.width - 20));
+      const boundedY = Math.max(20, Math.min(pigeon.y, dimensions.height - 20));
 
       if (!body) {
-        body = Bodies.circle(pigeon.x, pigeon.y, 20, {
+        // Create new pigeon body if it doesn't exist
+        body = Bodies.circle(boundedX, boundedY, 20, {
+          isStatic: true,
           friction: 10,
           render: {
             sprite: {
-              texture: pigeonSprite, // Use the extracted sprite data URL
+              texture: pigeonSprite,
               xScale: 0.5,
               yScale: 0.5,
             },
           },
-          mass: 1,
-          restitution: 0.5,
-          density: 0.001,
-          frictionAir: 0.01,
+          collisionFilter: {
+            group: -1, // Negative group means it won't collide with others in same group
+          },
         });
-        World.add(engine.current.world, body);
-        existingBodies.set(pigeon.id, body);
+        World.add(engine.world, body);
+        pigeonBodies.set(pigeon.id, body);
       } else {
-        Body.setPosition(body, { x: pigeon.x, y: pigeon.y });
+        // Update position with smooth transition
+        const currentPos = body.position;
+        const dx = boundedX - currentPos.x;
+        const dy = boundedY - currentPos.y;
+
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+          Body.setPosition(body, {
+            x: boundedX,
+            y: boundedY,
+          });
+        }
       }
     });
 
-    existingBodies.forEach((body, id) => {
+    // Remove bodies for pigeons that no longer exist in state
+    pigeonBodies.forEach((body, id) => {
       if (!pigeons.find((p) => p.id === id)) {
-        World.remove(engine.current.world, body);
-        existingBodies.delete(id);
+        World.remove(engine.world, body);
+        pigeonBodies.delete(id);
       }
     });
-  }, [pigeons, pigeonSprite]);
+
+    return () => {
+      pigeonBodies.forEach((body) => {
+        World.remove(engine.world, body);
+      });
+      pigeonBodies.clear();
+    };
+  }, [engine, pigeonSprite, pigeons, dimensions]);
 
   return (
     <div
-      ref={canvas as unknown as RefObject<HTMLDivElement>}
+      ref={canvas}
       className="bg-white h-full w-full flex justify-center items-center rounded-[12px] border-[3px] border-slate-800 overflow-hidden"
-    ></div>
+    />
   );
 }

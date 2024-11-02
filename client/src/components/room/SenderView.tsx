@@ -3,6 +3,10 @@ import { useRenderer } from "@hooks/useRenderer";
 import { usePigeonSpawner } from "@hooks/usePigeonSpawner";
 import { useCharacterBody } from "@hooks/useCharacterBody";
 import { usePigeonMovement } from "@hooks/usePigeonMovement";
+import {
+  SpawnedObject,
+  useProximityDetection,
+} from "@hooks/useProximityDetection";
 import useSocketIo from "@hooks/useSocketIo";
 import useSprite from "@hooks/useSprite";
 import { useRoomStore } from "@store/roomStore";
@@ -13,7 +17,7 @@ import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
 export default function SenderView() {
   const canvas = useRef<HTMLDivElement>(null);
   const socket = useSocketIo();
-  const { messages } = useMessageStore();
+  const { messages, dequeueByte } = useMessageStore();
   const { room } = useRoomStore();
 
   const { engine } = useRenderer(canvas, { background: "#BBBBBB" });
@@ -81,6 +85,17 @@ export default function SenderView() {
   });
 
   usePigeonMovement(engine, pigeons, senderBody, socket, room);
+  useProximityDetection({
+    spawnedObjects: pigeons,
+    staticObject: receiverBody!,
+    proximityThreshold: 20,
+    engine,
+    world: engine.world,
+    action: (spawnedBody: SpawnedObject) => {
+      console.log("Proximity detected!");
+      spawnedBody.payload = dequeueByte();
+    },
+  });
 
   return (
     <div

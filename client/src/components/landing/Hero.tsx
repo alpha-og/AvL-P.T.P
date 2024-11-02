@@ -30,7 +30,7 @@ const Hero = () => {
     };
   }, []);
   return (
-    <div className="hero h-full bg-base-200">
+    <div className="hero min-h-screen bg-base-200">
       {/* Constrain the max width for larger screens */}
       <div className="hero-content max-w-screen-lg w-full flex flex-col lg:flex-row items-center lg:items-start px-4">
         {/* Left: Pigeon Animation */}
