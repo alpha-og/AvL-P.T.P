@@ -68,7 +68,8 @@ export default function SenderView() {
 
   const { pigeons } = usePigeonSpawner(engine, pigeonSprite, messages, {
     maxPigeons: 1000,
-    spawnInterval: 1,
+    minSpawnInterval: 1,
+    maxSpawnInterval: 5,
     containerWidth,
     containerHeight,
   });
@@ -85,18 +86,18 @@ export default function SenderView() {
   });
 
   usePigeonMovement(engine, pigeons, senderBody, socket, room);
-  useProximityDetection({
-    spawnedObjects: pigeons,
-    staticObject: receiverBody!,
-    proximityThreshold: 20,
-    engine,
-    world: engine.world,
-    action: (spawnedBody: SpawnedObject) => {
-      console.log("Proximity detected!");
-      spawnedBody.payload = dequeueByte();
-    },
-  });
-
+  // useProximityDetection({
+  //   spawnedObjects: pigeons,
+  //   staticObject: receiverBody!,
+  //   proximityThreshold: 20,
+  //   engine,
+  //   world: engine.world,
+  //   action: (spawnedBody: SpawnedObject) => {
+  //     console.log("Proximity detected!");
+  //     spawnedBody.payload = dequeueByte();
+  //   },
+  // });
+  //
   return (
     <div
       ref={canvas}
