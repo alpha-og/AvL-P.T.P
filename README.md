@@ -45,9 +45,8 @@ This is the landing page of the website
 <img width="1280" alt="Features" src="https://github.com/user-attachments/assets/943ce3fa-a9be-4ca2-a0a3-fbe0046ddb94">
 This section of the landing page highlights the features of the project
 
-<img width="1280" alt="Bird swarm" src="https://github.com/user-attachments/assets/7567bf0a-f78e-4c76-aee3-59e6cdfb62dd">
+<img width="1280" alt="Screenshot 2024-11-03 at 1 29 29 AM" src="https://github.com/user-attachments/assets/f3a1fd4e-df47-4a1c-9c8f-05bd447c8087">
 The main attraction of the website is this page where users can start chatting/ sharing anything. Beware: Pigeons may turn against you!
-
 
 # Diagrams
 ![Workflow](Add your workflow/architecture diagram here)
