@@ -23,29 +23,30 @@ The Pigeon Transfer Protocol achieves transfer speeds beyond what the latest gig
 ### Technologies/Components Used
 - JS/ TS
 - ReactJS, ExpressJS
-- [Libraries used]
+- DaisyUI, Matter.js, SocketIO
 - NeoVim, Supermaven
 
 ### Implementation
 For Software:
 # Installation
 [commands]
-
+`pnpm i`
 # Run
 [commands]
-
+`pnpm run dev`
 ### Project Documentation
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+<img width="1280" alt="Website Hero" src="https://github.com/user-attachments/assets/b38383eb-f3f4-4c1d-9c5f-6ecf388c44b4">
+This is the landing page of the website
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+<img width="1280" alt="Features" src="https://github.com/user-attachments/assets/943ce3fa-a9be-4ca2-a0a3-fbe0046ddb94">
+This section of the landing page highlights the features of the project
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+<img width="1280" alt="Bird swarm" src="https://github.com/user-attachments/assets/7567bf0a-f78e-4c76-aee3-59e6cdfb62dd">
+The main attraction of the website is this page where users can start chatting/ sharing anything. Beware: Pigeons may turn against you!
+
 
 # Diagrams
 ![Workflow](Add your workflow/architecture diagram here)
@@ -60,7 +61,7 @@ For Software:
 [Add any extra demo materials/links]
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
+- Athul Anoop: Design, Development, Hosting
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
