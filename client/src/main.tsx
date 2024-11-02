@@ -20,6 +20,10 @@ const router = createBrowserRouter(
       path: "/pigeon-ads",
       element: <PigeonAds />,
     },
+    {
+      path: "/:pathMatch(.*)*",
+      element: <Landing />,
+    },
   ],
   {
     basename: import.meta.env.BASE_URL,
