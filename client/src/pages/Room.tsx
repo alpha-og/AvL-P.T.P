@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import useSocketIo from "@hooks/useSocketIo";
 import RoomIDChip from "@components/room/RoomIdChip";
-import SenderContainer from "@/components/room/SenderScene";
-import ViewerContainer from "@/components/room/ViewerScene";
+import SenderContainer from "@/components/room/SenderView";
+import ViewerContainer from "@/components/room/ReceiverView";
 import { SendIcon } from "lucide-react";
 import { useRoomStore } from "@store/roomStore";
 import { usePigeonStore } from "@store/pigeonStore";
+import { useMessageStore } from "@store/messageStore";
 
 type T_Pigeon = {
   id: string;
@@ -28,8 +29,8 @@ function generateRoomID(length = 8) {
 export default function Room() {
   const { isSender, room, setRoom, setIsSender } = useRoomStore();
   const { setPigeons } = usePigeonStore();
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const { addMessage } = useMessageStore();
+  const [message, setMessage] = useState<string>("");
   const [joinedRoom, setJoinedRoom] = useState(false);
   const socket = useSocketIo();
   const handleJoin = () => {
@@ -81,7 +82,7 @@ export default function Room() {
                 className="btn btn-primary bg-base-300 rounded-box "
                 onClick={() => {
                   socket.emit("send_message", room, message);
-                  setMessages([...messages, message]);
+                  addMessage(message);
                   setMessage("");
                 }}
               >
