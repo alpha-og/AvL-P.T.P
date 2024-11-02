@@ -34,7 +34,7 @@ export const usePigeonMovement = (
       //   x: pigeon.x,
       //   y: pigeon.y,
       // }));
-
+      //
       // socket.emit("update_pigeon", { room, pigeons: updatedPigeons });
     };
 
