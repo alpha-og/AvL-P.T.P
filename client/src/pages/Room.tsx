@@ -88,6 +88,7 @@ export default function Room() {
               <button
                 className="btn btn-primary bg-base-300 rounded-box "
                 onClick={() => {
+                  setShowProgress(true);
                   addMessage(message);
                   setMessage("");
                 }}
