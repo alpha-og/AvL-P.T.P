@@ -3,10 +3,6 @@ import { useRenderer } from "@hooks/useRenderer";
 import { usePigeonSpawner } from "@hooks/usePigeonSpawner";
 import { useCharacterBody } from "@hooks/useCharacterBody";
 import { usePigeonMovement } from "@hooks/usePigeonMovement";
-import {
-  SpawnedObject,
-  useProximityDetection,
-} from "@hooks/useProximityDetection";
 import useSocketIo from "@hooks/useSocketIo";
 import useSprite from "@hooks/useSprite";
 import { useRoomStore } from "@store/roomStore";
@@ -17,7 +13,7 @@ import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
 export default function SenderView() {
   const canvas = useRef<HTMLDivElement>(null);
   const socket = useSocketIo();
-  const { messages, dequeueByte } = useMessageStore();
+  const { messages } = useMessageStore();
   const { room } = useRoomStore();
 
   const { engine } = useRenderer(canvas, { background: "#BBBBBB" });
@@ -79,7 +75,7 @@ export default function SenderView() {
     y: containerHeight - 48,
   });
 
-  const receiverBody = useCharacterBody(engine, receiverSprite, {
+  useCharacterBody(engine, receiverSprite, {
     x: containerWidth - 30,
     y: containerHeight - 48,
     flipped: true,
