@@ -24,7 +24,7 @@ The Pigeon Transfer Protocol achieves transfer speeds beyond what the latest gig
 - JS/ TS
 - ReactJS, ExpressJS
 - DaisyUI, Matter.js, SocketIO
-- NeoVim, Supermaven, Claude
+- PNPM, NodeJS, NeoVim
 
 ### Implementation
 For Software:
