@@ -7,12 +7,6 @@ import useSprite from "@hooks/useSprite";
 import pigeonSpriteSheet from "@assets/pigeon_sprite_sheet.png";
 import idleManSpriteSheet from "@assets/idle_man_sprite_sheet.png";
 
-interface Pigeon {
-  id: string;
-  x: number;
-  y: number;
-}
-
 export default function ReceiverView() {
   const canvas = useRef<HTMLDivElement>(null);
   const { pigeons } = usePigeonStore();
