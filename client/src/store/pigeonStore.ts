@@ -4,6 +4,7 @@ type T_Pigeon = {
   id: string;
   x: number;
   y: number;
+  payload: number;
 };
 
 type T_PigeonStore = {
