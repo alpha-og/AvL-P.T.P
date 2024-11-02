@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { XCircle } from "lucide-react";
 
 const pigeonFacts = [
   "Pigeons can see ultraviolet light, which humans cannot perceive.",
@@ -136,12 +137,12 @@ const PigeonFactsRandom: React.FC = () => {
       const newPopup = {
         id: popupId,
         fact: pigeonFacts[randomIndex],
-        x: Math.random() * window.innerWidth, // Random x position
-        y: Math.random() * window.innerHeight, // Random y position
+        x: Math.random() * (window.innerWidth - 200), // Adjust to fit screen width
+        y: Math.random() * (window.innerHeight - 200), // Adjust to fit screen height
       };
       setPopups((prevPopups) => [...prevPopups, newPopup]);
-      setPopupId((prevId) => prevId + 1); // Increment the popup ID
-    }, 100); // Change fact every 3 seconds
+      setPopupId((prevId) => prevId + 1);
+    }, 100); // Spawn every second
 
     return () => clearInterval(intervalId);
   }, [popupId]);
@@ -151,27 +152,32 @@ const PigeonFactsRandom: React.FC = () => {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
-      <h1 className="absolute top-10 left-1/2 transform -translate-x-1/2 text-3xl font-bold mb-4">
-        You have used up all your pigeon credits!
-      </h1>
+    <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-blue-100 to-purple-100">
+      <div className="absolute flex flex-col justify-center items-center top-[40vh] left-1/2 transform -translate-x-1/2 text-3xl font-bold text-gray-800 mb-4">
+        <h1 className="text-center">You’ve used up all your pigeon credits!</h1>
+        <span className="text-primary text-center rounded-box w-full text-4xl">
+          Get Pro!
+        </span>
+      </div>
       {popups.map((popup) => (
         <div
           key={popup.id}
-          className="absolute p-4 bg-blue-300 text-black border border-blue-500 rounded shadow-lg"
+          className="absolute p-4 max-w-xs bg-white text-gray-700 border border-gray-300 rounded-lg shadow-lg transition-transform transform hover:scale-105"
           style={{
             left: popup.x,
             top: popup.y,
             transform: "translate(-50%, -50%)",
           }}
         >
-          <p className="text-lg">{popup.fact}</p>
-          <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => closePopup(popup.id)}
-          >
-            Close
-          </button>
+          <div className="flex items-start">
+            <div className="text-indigo-600 mr-2">
+              <XCircle
+                className="w-6 h-6 cursor-pointer"
+                onClick={() => closePopup(popup.id)}
+              />
+            </div>
+            <p className="text-sm font-medium leading-tight">{popup.fact}</p>
+          </div>
         </div>
       ))}
     </div>

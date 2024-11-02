@@ -67,7 +67,7 @@ export default function Room() {
     <div className="h-screen w-full p-4 flex flex-col items-center justify-center ">
       {showProgress && (
         <div className="absolute top-0 left-0 w-full h-full bg-base-100 opacity-50 z-10">
-          <ProgressBar items={pigeons} />
+          <ProgressBar total={1000} current={pigeons.length} />
         </div>
       )}
       {joinedRoom ? (
