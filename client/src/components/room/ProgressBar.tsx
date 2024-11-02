@@ -41,7 +41,7 @@ const ProgressBar = ({ current, total, label }: ProgressBarProps) => {
 
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="bg-base-200 p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+      <div className="bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md text-center">
         {/* Label and Percentage Display */}
         <div className="flex items-center justify-between mb-2 text-xs md:text-sm lg:text-base">
           <span>{label || "Progress"}</span>

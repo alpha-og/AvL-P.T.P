@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { World, Bodies } from "matter-js";
 import { SpawnedObject } from "./useProximityDetection";
+import { useNavigate } from "react-router-dom";
 
 export type SpawnerOptions = {
   maxPigeons?: number;
@@ -18,12 +19,14 @@ export const usePigeonSpawner = (
 ) => {
   const [pigeons, setPigeons] = useState<SpawnedObject[]>([]);
   const spawnBlockedRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (pigeons.length > options.maxPigeons!) {
-      window.location.href = "/pigeon-ads";
+      navigate("/pigeon-ads");
+      spawnBlockedRef.current = true;
     }
-  }, [pigeons.length, options.maxPigeons]);
+  }, [pigeons.length, options.maxPigeons, navigate]);
 
   const spawnPigeon = useCallback(() => {
     // Ensure there's a message to deliver and that spawning is not blocked
