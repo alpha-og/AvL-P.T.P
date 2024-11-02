@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type T_Pigeon = {
+export type T_Pigeon = {
   id: string;
   x: number;
   y: number;

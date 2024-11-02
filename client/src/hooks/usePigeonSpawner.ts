@@ -58,6 +58,7 @@ export const usePigeonSpawner = (
     setPigeons((prev) => [
       ...prev,
       {
+        id: pigeonBody.id + "",
         x: spawnX,
         y: spawnY,
         payload: 0,

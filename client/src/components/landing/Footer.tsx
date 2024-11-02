@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertTriangle, Shield, Scale, FileWarning } from "lucide-react";
 
 const Footer = () => {

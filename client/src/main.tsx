@@ -6,20 +6,25 @@ import Room from "./pages/Room";
 import Landing from "./pages/Landing";
 import Navbar from "./components/common/Navbar";
 import PigeonAds from "./pages/PigeonAds";
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Landing />,
+    },
+    {
+      path: "/room",
+      element: <Room />,
+    },
+    {
+      path: "/pigeon-ads",
+      element: <PigeonAds />,
+    },
+  ],
   {
-    path: "/",
-    element: <Landing />,
+    basename: import.meta.env.BASE_URL,
   },
-  {
-    path: "/room",
-    element: <Room />,
-  },
-  {
-    path: "/pigeon-ads",
-    element: <PigeonAds />,
-  },
-]);
+);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

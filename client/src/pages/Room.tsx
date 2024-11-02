@@ -7,6 +7,7 @@ import { SendIcon } from "lucide-react";
 import { useRoomStore } from "@store/roomStore";
 import { usePigeonStore } from "@store/pigeonStore";
 import { useMessageStore } from "@store/messageStore";
+import ProgressBar from "@components/room/ProgressBar";
 
 type T_Pigeon = {
   id: string;
@@ -28,26 +29,27 @@ function generateRoomID(length = 8) {
 }
 export default function Room() {
   const { isSender, room, setRoom, setIsSender } = useRoomStore();
-  const { setPigeons } = usePigeonStore();
+  const { pigeons, setPigeons } = usePigeonStore();
+  const [showProgress, setShowProgress] = useState(false);
   const { addMessage } = useMessageStore();
   const [message, setMessage] = useState<string>("");
   const [joinedRoom, setJoinedRoom] = useState(false);
   const socket = useSocketIo();
   const handleJoin = () => {
+    setJoinedRoom(true);
     if (!room || !socket.connected) return;
     console.log("joining room", room);
     socket.emit("join_room", room);
     setIsSender(false);
-    setJoinedRoom(true);
   };
   const handleCreate = () => {
+    setJoinedRoom(true);
     if (!socket.connected) return;
     const roomId = generateRoomID();
     console.log("creating room");
     socket.emit("join_room", roomId);
     setRoom(roomId);
     setIsSender(true);
-    setJoinedRoom(true);
   };
   useEffect(() => {
     socket.on("notification", (message: string) => {
@@ -63,6 +65,11 @@ export default function Room() {
 
   return (
     <div className="h-screen w-full p-4 flex flex-col items-center justify-center ">
+      {showProgress && (
+        <div className="absolute top-0 left-0 w-full h-full bg-base-100 opacity-50 z-10">
+          <ProgressBar items={pigeons} />
+        </div>
+      )}
       {joinedRoom ? (
         <div className="w-full h-full flex flex-col items-center justify-center gap-2">
           <div className="relative w-full h-full flex flex-col items-center justify-center border border-zinc-50/10 rounded-xl">
@@ -82,6 +89,7 @@ export default function Room() {
                 className="btn btn-primary bg-base-300 rounded-box "
                 onClick={() => {
                   socket.emit("send_message", room, message);
+                  setShowProgress(true);
                   addMessage(message);
                   setMessage("");
                 }}

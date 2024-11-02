@@ -1,31 +1,28 @@
-// FeatureSection.jsx
-import React from 'react';
-
 const features = [
   {
-    icon: '🚀',
-    title: 'Fast Transfers',
-    description: 'Experience lightning-fast transfers over local networks.',
+    icon: "🚀",
+    title: "Fast Transfers",
+    description: "Experience lightning-fast transfers over local networks.",
   },
   {
-    icon: '😆',
-    title: 'Quirky Delivery',
-    description: 'Enjoy a humorously frustrating transfer process.',
+    icon: "😆",
+    title: "Quirky Delivery",
+    description: "Enjoy a humorously frustrating transfer process.",
   },
   {
-    icon: '🌧️',
-    title: 'Real-time Weather Effects',
-    description: 'Weather impacts pigeon flight paths for a unique experience.',
+    icon: "🌧️",
+    title: "Real-time Weather Effects",
+    description: "Weather impacts pigeon flight paths for a unique experience.",
   },
   {
-    icon: '🕵️',
-    title: 'Privacy Focused',
-    description: 'All transfers stay within your local network.',
+    icon: "🕵️",
+    title: "Privacy Focused",
+    description: "All transfers stay within your local network.",
   },
 ];
 
 const FeatureSection = () => (
-  <section className="py-12 bg-base-100 text-center">
+  <section id="features" className="py-12 bg-base-100 text-center">
     <h2 className="text-3xl font-bold mb-8">Features</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       {features.map((feature, index) => (

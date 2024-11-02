@@ -15,4 +15,10 @@ export default defineConfig({
       "@store": "/src/store",
     },
   },
+
+  base: ".",
+  build: {
+    outDir: "dist",
+  },
+  publicDir: "public",
 });
