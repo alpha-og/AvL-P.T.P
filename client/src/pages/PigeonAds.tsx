@@ -153,7 +153,7 @@ const PigeonFactsRandom: React.FC = () => {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
       <h1 className="absolute top-10 left-1/2 transform -translate-x-1/2 text-3xl font-bold mb-4">
-        Annoying Pigeon Facts!
+        You have used up all your pigeon credits!
       </h1>
       {popups.map((popup) => (
         <div
