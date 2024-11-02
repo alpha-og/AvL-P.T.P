@@ -44,12 +44,12 @@ export default function Room() {
   };
   const handleCreate = () => {
     setJoinedRoom(true);
+    setIsSender(true);
     if (!socket.connected) return;
     const roomId = generateRoomID();
     console.log("creating room");
     socket.emit("join_room", roomId);
     setRoom(roomId);
-    setIsSender(true);
   };
   useEffect(() => {
     socket.on("notification", (message: string) => {
