@@ -30,10 +30,13 @@ The Pigeon Transfer Protocol achieves transfer speeds beyond what the latest gig
 For Software:
 # Installation
 client: `cd client && pnpm i`
+
 server: `cd server && pnpm i`
 # Run
 [commands]
+
 client: `pnpm dev`
+
 server: `pnpm dev`
 ### Project Documentation
 For Software:
